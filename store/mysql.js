@@ -66,7 +66,7 @@ function get(table, id) {
   return new Promise((resolve, reject) => {
       connection.query(`SELECT * FROM ${table} WHERE id=${id}`, (err, result) => {
           if (err) return reject(err);
-          resolve(result[0] || null);
+          resolve(result);
       })
   })
 }

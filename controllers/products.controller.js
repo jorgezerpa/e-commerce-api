@@ -1,4 +1,5 @@
 const { insert, list, get, update, remove  } = require('../store/mysql');
+const boom = require('@hapi/boom');
 
 const TABLE = 'products';
 
@@ -8,6 +9,9 @@ async function listProducts(){
 }
 async function getProduct(id){
     const result = await get(TABLE, id);
+    if(result.length<=0){
+        throw boom.notFound('product not found')
+    }
     return result;
 }
 async function createProduct(product){
