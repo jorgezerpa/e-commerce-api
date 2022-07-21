@@ -9,6 +9,8 @@ const app = express();
 
 app.use(express.json());
 
+app.use('/uploads', express.static(__dirname + '/uploads'));
+// app.use('/static', express.static('public'));
 routerApi(app);
 
 app.use(logErrors);

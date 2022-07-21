@@ -1,9 +1,12 @@
 const express = require('express');
+const boom = require('@hapi/boom');
 const controller = require('../controllers/products.controller');
 const validatorhandler = require('../middlewares/validatorHandler');
-const { createProductSchema, updateProductSchema, getProductSchema, deleteProductSchema } = require('../schemas/product.schema');
-
 const router = express.Router();
+const { createProductSchema, updateProductSchema, getProductSchema, deleteProductSchema } = require('../schemas/product.schema');
+const upload = require('../utils/multer');
+
+const filesExpect  = [{name:'image', maxCount:1}, {name:'file', maxCount:1}]; //multer 
 
     //get  all products
 router.get('/', async(req, res, next)=>{
@@ -34,9 +37,16 @@ router.get('/:id', validatorhandler(getProductSchema, 'params'),  async(req, res
 })
 
     //create product
-router.post('/', validatorhandler(createProductSchema, 'body'), async(req, res, next)=>{
+    // validatorhandler(createProductSchema, 'body')
+router.post('/', upload.fields(filesExpect) , async(req, res, next)=>{
     try{
-        const data = req.body;
+        const data = {
+            ...req.body,
+            image: req.files.image[0].filename,
+            file: req.files.file[0].filename,
+        }
+        const {error} = createProductSchema.validate(data);
+        if(error) throw(error);
         const result = await controller.createProduct(data);
         res.status(201).json({
             message: 'product created',
@@ -44,7 +54,7 @@ router.post('/', validatorhandler(createProductSchema, 'body'), async(req, res, 
         });
     }
     catch(e){
-        next(e)
+        next(boom.badRequest(e))
     }
 })
     

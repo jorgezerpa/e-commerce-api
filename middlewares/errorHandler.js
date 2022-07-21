@@ -5,7 +5,7 @@ function logErrors(err, req, res, next){
     if(!err.isBoom){
         console.log({
             stack: err.stack,
-            error: err.error
+            error: err
         });
     }
     next(err);
