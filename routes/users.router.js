@@ -74,21 +74,28 @@ router.delete('/:id', validatorhandler(deleteUserSchema, 'params'), async(req, r
 
     //update product
 router.patch('/:id',
-    validatorhandler( getUserSchema, 'params'),
-    validatorhandler( updateUserSchema, 'body'),
-    async(req, res, next)=>{
-    try{
-        const { id } = req.params;
-        const data = req.body;
-        const result = await controller.updateUser(data, id);
-        res.status(200).json({
-            message: 'user updated',
-            result: result
-        });
+uploadUser.fields(filesExpect),    
+validatorhandler( getUserSchema, 'params'),
+async(req, res, next)=>{
+try{
+    let data = {...req.body};
+    if(req.files.image){
+        data.image = req.files.image[0].filename;
     }
-    catch(e){
-        next(e)
-    }
+    const { id } = req.params;
+    const { error } = updateUserSchema.validate(data);
+    if(error){throw(boom.badRequest(error))}
+    
+                //here is the work
+    const result = await controller.updateUser(data, id);
+    res.status(200).json({
+        message: 'user updated',
+        result: result
+    });
+}
+catch(e){
+    next(e)
+}
 })
 
 

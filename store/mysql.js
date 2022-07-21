@@ -1,5 +1,6 @@
 const mysql = require('mysql');
-
+const fs = require('fs');
+const path = require('path');
 
 const dbconf = {
   host: process.env.DB_HOST,
@@ -43,9 +44,34 @@ function insert(table, data) {
   })
 }
 
-function update(table, data, id) {
+function update(table, data, id, from) {
   return new Promise((resolve, reject) => {
-    // UPDATE customers SET address = 'Canyon 123' WHERE address = 'Valley 345'
+      if(data.file || data.image){
+        if(data.file){
+          connection.query(`SELECT file FROM ${table} WHERE id=${id}`, (err, result) => {
+            if (err) return reject(err);
+            fs.unlink(path.join(__dirname, `/../uploads/products/${result[0].file}`), (err)=>{
+              if(err){
+                console.log(err);
+                return reject(err);
+              } 
+            })
+          })
+        } 
+        if(data.image){
+          connection.query(`SELECT image FROM ${table} WHERE id=${id}`, (err, result) => {
+            if (err) return reject(err);
+            fs.unlink(path.join(__dirname, `/../uploads/${from}/${result[0].image}`), (err)=>{
+              if(err){
+                console.log(err);
+                return reject(err);
+              } 
+            })
+          })
+        } 
+      } //end if wrapper 
+      
+
       connection.query(`UPDATE ${table} SET ? WHERE id=${id}`, data, (err, result) => {
           if (err) return reject(err);
           resolve(result);

@@ -22,7 +22,7 @@ async function createProduct(product){
 }
 
 async function updateProduct(product, id){
-    const result = await update(TABLE, product, id);
+    const result = await update(TABLE, product, id, 'thumbnails');
     return result;
 }
 

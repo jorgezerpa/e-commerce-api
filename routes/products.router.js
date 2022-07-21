@@ -37,7 +37,6 @@ router.get('/:id', validatorhandler(getProductSchema, 'params'),  async(req, res
 })
 
     //create product
-    // validatorhandler(createProductSchema, 'body')
 router.post('/', uploadProduct.fields(filesExpect) , async(req, res, next)=>{
     try{
         const data = {
@@ -75,12 +74,22 @@ router.delete('/:id', validatorhandler(deleteProductSchema, 'params'), async(req
 
     //update product
 router.patch('/:id',
+    uploadProduct.fields(filesExpect),    
     validatorhandler( getProductSchema, 'params'),
-    validatorhandler( updateProductSchema, 'body'),
     async(req, res, next)=>{
     try{
+        let data = {...req.body};
+        if(req.files.image){
+            data.image = req.files.image[0].filename;
+        }
+        if(req.files.file){
+            data.file = req.files.file[0].filename;
+        }
         const { id } = req.params;
-        const data = req.body;
+        const { error } = updateProductSchema.validate(data);
+        if(error){throw(boom.badRequest(error))}
+        
+                    //here is the work
         const result = await controller.updateProduct(data, id);
         res.status(200).json({
             message: 'product updated',

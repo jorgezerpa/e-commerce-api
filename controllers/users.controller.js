@@ -22,7 +22,7 @@ async function createUser(user){
 }
 
 async function updateUser(product, id){
-    const result = await update(TABLE, product, id);
+    const result = await update(TABLE, product, id, 'users');
     return result;
 }
 
