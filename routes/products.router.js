@@ -4,7 +4,7 @@ const controller = require('../controllers/products.controller');
 const validatorhandler = require('../middlewares/validatorHandler');
 const router = express.Router();
 const { createProductSchema, updateProductSchema, getProductSchema, deleteProductSchema } = require('../schemas/product.schema');
-const upload = require('../utils/multer');
+const { uploadProduct } = require('../utils/multer');
 
 const filesExpect  = [{name:'image', maxCount:1}, {name:'file', maxCount:1}]; //multer 
 
@@ -38,7 +38,7 @@ router.get('/:id', validatorhandler(getProductSchema, 'params'),  async(req, res
 
     //create product
     // validatorhandler(createProductSchema, 'body')
-router.post('/', upload.fields(filesExpect) , async(req, res, next)=>{
+router.post('/', uploadProduct.fields(filesExpect) , async(req, res, next)=>{
     try{
         const data = {
             ...req.body,

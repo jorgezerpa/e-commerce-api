@@ -17,7 +17,6 @@ const createProductSchema = Joi.object({
     user_id: user_id.required(),
     image: image.required(),
     file: file.required(),
-    sells: sells.required(),
     category: category.required(),
 })
 
