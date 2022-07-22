@@ -6,7 +6,7 @@ const TABLE = 'auth';
 async function getAuthByEmail(email){
     const result = await filterByEmail(TABLE, email);
     if(result.length<=0){
-        throw boom.notFound('product not found')
+        throw boom.unauthorized('unauthorized')
     }
     return result[0];
 }

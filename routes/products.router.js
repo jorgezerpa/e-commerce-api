@@ -5,6 +5,8 @@ const validatorhandler = require('../middlewares/validatorHandler');
 const router = express.Router();
 const { createProductSchema, updateProductSchema, getProductSchema, deleteProductSchema } = require('../schemas/product.schema');
 const { uploadProduct } = require('../utils/multer');
+const passport = require('passport');
+const authorization = require('../utils/authorization/productsAuthorization');
 
 const filesExpect  = [{name:'image', maxCount:1}, {name:'file', maxCount:1}]; //multer 
 
@@ -37,10 +39,14 @@ router.get('/:id', validatorhandler(getProductSchema, 'params'),  async(req, res
 })
 
     //create product
-router.post('/', uploadProduct.fields(filesExpect) , async(req, res, next)=>{
+router.post('/',
+    passport.authenticate('jwt', {session:false, }),
+    uploadProduct.fields(filesExpect),
+    async(req, res, next)=>{
     try{
         const data = {
             ...req.body,
+            user_id: req.user.id,
             image: req.files.image[0].filename,
             file: req.files.file[0].filename,
         }
@@ -59,7 +65,11 @@ router.post('/', uploadProduct.fields(filesExpect) , async(req, res, next)=>{
     
     
     //delete product
-router.delete('/:id', validatorhandler(deleteProductSchema, 'params'), async(req, res, next)=>{
+router.delete('/:id',
+    passport.authenticate('jwt', {session:false, }),
+    authorization.isOwn,
+    validatorhandler(deleteProductSchema, 'params'),
+    async(req, res, next)=>{
     try{
         const { id } = req.params;
         const result = await controller.deleteProduct(id);
@@ -74,6 +84,8 @@ router.delete('/:id', validatorhandler(deleteProductSchema, 'params'), async(req
 
     //update product
 router.patch('/:id',
+    passport.authenticate('jwt', {session:false, }),
+    authorization.isOwn,
     uploadProduct.fields(filesExpect),    
     validatorhandler( getProductSchema, 'params'),
     async(req, res, next)=>{

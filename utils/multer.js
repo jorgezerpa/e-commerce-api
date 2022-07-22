@@ -20,7 +20,7 @@ const uploadProduct = multer({storage: storageProducts});
 
 
         //storage user
-const  storageUser = multer.diskStorage({
+        const  storageUser = multer.diskStorage({
     destination: function(req, file, cb){
         cb(null, 'uploads/users')
     },

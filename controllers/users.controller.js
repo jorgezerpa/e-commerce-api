@@ -1,4 +1,4 @@
-const { insert, list, get, update, remove  } = require('../store/mysql');
+const { insert, list, get, update, remove, filterByEmail  } = require('../store/mysql');
 const boom = require('@hapi/boom');
 const bcrypt = require('bcrypt');
 
@@ -23,9 +23,13 @@ async function createUser(user){
         email: user.email,
         password: hash,
     };
+        //insert user
     delete user.password;
-    const insertPassword = await insert('auth', auth);
     const result = await insert(TABLE, user);
+    const user_id = await filterByEmail(TABLE, user.email);
+        //insert auth
+    auth.id = user_id[0].id;
+    const insertAuth = await insert('auth', auth);
     return result;
 }
 
