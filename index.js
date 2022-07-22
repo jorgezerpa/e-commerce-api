@@ -7,10 +7,10 @@ const { logErrors, errorHandler, boomError} = require('./middlewares/errorHandle
 const PORT = process.env.PORT;
 const app = express();
 
-app.use(express.json());
+app.use(express.json()); 
+require('./utils/auth'); //passport
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
-// app.use('/static', express.static('public'));
 routerApi(app);
 
 app.use(logErrors);

@@ -36,8 +36,7 @@ router.get('/:id', validatorhandler(getUserSchema, 'params'),  async(req, res, n
     
 })
 
-    //create product
-    // validatorhandler(createProductSchema, 'body')
+    //create user
 router.post('/', uploadUser.fields(filesExpect) , async(req, res, next)=>{
     try{
         const data = {
@@ -58,7 +57,7 @@ router.post('/', uploadUser.fields(filesExpect) , async(req, res, next)=>{
 })
     
     
-    //delete product
+    //delete user
 router.delete('/:id', validatorhandler(deleteUserSchema, 'params'), async(req, res, next)=>{
     try{
         const { id } = req.params;
@@ -72,7 +71,7 @@ router.delete('/:id', validatorhandler(deleteUserSchema, 'params'), async(req, r
     }
 })
 
-    //update product
+    //update user
 router.patch('/:id',
 uploadUser.fields(filesExpect),    
 validatorhandler( getUserSchema, 'params'),

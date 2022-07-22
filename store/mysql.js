@@ -106,6 +106,15 @@ function remove(table, id) {
   })
 }
 
+function filterByEmail(table, email){
+  return new Promise((resolve, reject) => {
+    connection.query(`SELECT * FROM ${table} WHERE email='${email}'`, (err, result) => {
+      if(err) return reject(err);
+      resolve(result)
+    })
+  })
+}
+
 
 
 module.exports = {
@@ -114,4 +123,5 @@ module.exports = {
   list,
   get,
   remove,
+  filterByEmail,
 };
