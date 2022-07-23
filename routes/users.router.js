@@ -41,7 +41,6 @@ router.get('/:id', validatorhandler(getUserSchema, 'params'),  async(req, res, n
     //create user
 router.post('/', uploadUser.fields(filesExpect) , async(req, res, next)=>{
     try{
-        console.log(req.files)
         const data = {
             ...req.body,
             image: req.files.image[0].filename,

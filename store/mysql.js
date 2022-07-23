@@ -45,7 +45,7 @@ function insert(table, data) {
   })
 }
 
-function update(table, data, id, from) {
+function update(table, data, id, from='') {
   return new Promise((resolve, reject) => {
       if(data.file || data.image){
         if(data.file){
@@ -101,6 +101,19 @@ function get(table, id) {
 function remove(table, id) {
   return new Promise((resolve, reject) => {
       connection.query(`DELETE FROM ${table} WHERE id=${id}`, (err, result) => {
+          if(table==='users'){
+            removeUserProducts(id)            
+          }
+          if (err) return reject(err);
+          if(result.affectedRows<=0) return reject(boom.notFound('not found'))
+          resolve(true);
+      })
+  })
+}
+
+function removeUserProducts(user_id) {
+  return new Promise((resolve, reject) => {
+      connection.query(`DELETE FROM products WHERE user_id=${user_id}`, (err, result) => {
         console.log(result)
           if (err) return reject(err);
           if(result.affectedRows<=0) return reject(boom.notFound('not found'))

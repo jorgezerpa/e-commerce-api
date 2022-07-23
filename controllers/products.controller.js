@@ -28,6 +28,7 @@ async function updateProduct(product, id){
 
 async function deleteProduct(id){
     const result = await remove(TABLE, id);
+    console.log(result)
     return result;
 }
 
