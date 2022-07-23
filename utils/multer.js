@@ -1,4 +1,5 @@
 const multer = require('multer');
+const boom = require('@hapi/boom')
 
         //storage products
 const  storageProducts = multer.diskStorage({
@@ -15,7 +16,27 @@ const  storageProducts = multer.diskStorage({
     }
 })
 
-const uploadProduct = multer({storage: storageProducts});
+const uploadProduct = multer({
+    storage: storageProducts,
+    fileFilter: (req, file, cb) => {
+        if ( file.fieldname==='image' &&
+        (file.mimetype == "image/jpg" || file.mimetype == "image/png" || file.mimetype == "image/jpeg")) {
+            cb(null, true);
+        }
+        else if ( file.fieldname==='file' &&
+            (file.mimetype == "application/pdf")) {
+            cb(null, true);
+        }
+        // if (file.fieldname==='file' &&
+        //     file.mimetype == "application/pdf") {
+        //     cb(null, true);
+        // }
+        else {
+            console.log('eeeeerroororororo')
+          cb(boom.badRequest('not file type allowed'));
+        }
+    },
+});
 
 
 
@@ -30,8 +51,6 @@ const uploadProduct = multer({storage: storageProducts});
 })
 
 const uploadUser = multer({storage: storageUser});
-
-        //middleware
         
 module.exports = {
     uploadProduct,

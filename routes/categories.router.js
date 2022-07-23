@@ -4,10 +4,13 @@ const controller = require('../controllers/categories.controller');
 const validatorhandler = require('../middlewares/validatorHandler');
 const router = express.Router();
 const { createCategorySchema, updateCategorySchema, getCategorySchema, deleteCategorySchema } = require('../schemas/category.schema');
+const passport = require('passport');
+const adminAuthorization = require('../utils/authorization/adminAuthorization');
+
 
 const filesExpect  = [{name:'image', maxCount:1}, {name:'file', maxCount:1}]; //multer 
 
-    //get  all products
+    //get  all categories
 router.get('/', async(req, res, next)=>{
     try{
         const categories = await controller.listCategories();
@@ -20,7 +23,7 @@ router.get('/', async(req, res, next)=>{
     }
 })
 
-    //get  one product
+    //get one category
 router.get('/:id', validatorhandler(getCategorySchema, 'params'),  async(req, res, next)=>{
     try{
         const { id } = req.params;
@@ -34,13 +37,16 @@ router.get('/:id', validatorhandler(getCategorySchema, 'params'),  async(req, re
     }
 })
 
-    //create product
-router.post('/', validatorhandler(createCategorySchema, 'body'), async(req, res, next)=>{
+router.post('/',
+    passport.authenticate('jwt', { session: false }),
+    adminAuthorization.isAdmin,
+    validatorhandler(createCategorySchema, 'body'),
+    async(req, res, next)=>{
     try{
         const data = req.body;
         const result = await controller.createCategory(data);
         res.status(201).json({
-            message: 'product created',
+            message: 'category created',
             result: result
         })
     }
@@ -51,7 +57,10 @@ router.post('/', validatorhandler(createCategorySchema, 'body'), async(req, res,
     
     
     //delete product
-router.delete('/:id', validatorhandler(deleteCategorySchema, 'params'), async(req, res, next)=>{
+router.delete('/:id',
+    passport.authenticate('jwt', { session: false }),
+    adminAuthorization.isAdmin,
+    validatorhandler(deleteCategorySchema, 'params'), async(req, res, next)=>{
     try{
         const { id } = req.params;
         const category = await controller.deleteCategory(id);
@@ -66,6 +75,8 @@ router.delete('/:id', validatorhandler(deleteCategorySchema, 'params'), async(re
 
     //update product
 router.patch('/:id',
+    passport.authenticate('jwt', { session: false }),
+    adminAuthorization.isAdmin,
     validatorhandler( getCategorySchema, 'params'),
     validatorhandler( updateCategorySchema, 'body'),
     async(req, res, next)=>{
