@@ -40,6 +40,7 @@ async function updateUser(product, id){
 
 async function deleteUser(id){
     const result = await remove(TABLE, id);
+    const insertAuth = await remove('auth', id);
     return result;
 }
 

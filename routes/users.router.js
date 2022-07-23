@@ -4,6 +4,8 @@ const controller = require('../controllers/users.controller');
 const validatorhandler = require('../middlewares/validatorHandler');
 const router = express.Router();
 const { createUserSchema, updateUserSchema, getUserSchema, deleteUserSchema } = require('../schemas/user.schema');
+const passport = require('passport');
+const authorization = require('../utils/authorization/usersAuthorization');
 const { uploadUser } = require('../utils/multer');
 
 const filesExpect  = [{name:'image', maxCount:1}]; //multer 
@@ -39,6 +41,7 @@ router.get('/:id', validatorhandler(getUserSchema, 'params'),  async(req, res, n
     //create user
 router.post('/', uploadUser.fields(filesExpect) , async(req, res, next)=>{
     try{
+        console.log(req.files)
         const data = {
             ...req.body,
             image: req.files.image[0].filename,
@@ -58,9 +61,11 @@ router.post('/', uploadUser.fields(filesExpect) , async(req, res, next)=>{
     
     
     //delete user
-router.delete('/:id', validatorhandler(deleteUserSchema, 'params'), async(req, res, next)=>{
+router.delete('/',
+    passport.authenticate('jwt', {session: false}),
+    async(req, res, next)=>{
     try{
-        const { id } = req.params;
+        const { id } = req.user;
         const result = await controller.deleteUser(id);
         res.status(200).json({
             message: 'user deleted',
@@ -72,16 +77,16 @@ router.delete('/:id', validatorhandler(deleteUserSchema, 'params'), async(req, r
 })
 
     //update user
-router.patch('/:id',
+router.patch('/',
+passport.authenticate('jwt', {session: false}),
 uploadUser.fields(filesExpect),    
-validatorhandler( getUserSchema, 'params'),
 async(req, res, next)=>{
 try{
     let data = {...req.body};
     if(req.files.image){
         data.image = req.files.image[0].filename;
     }
-    const { id } = req.params;
+    const id = req.user.id;
     const { error } = updateUserSchema.validate(data);
     if(error){throw(boom.badRequest(error))}
     

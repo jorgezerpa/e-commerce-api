@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const fs = require('fs');
 const path = require('path');
+const boom = require('@hapi/boom');
 
 const dbconf = {
   host: process.env.DB_HOST,
@@ -100,7 +101,9 @@ function get(table, id) {
 function remove(table, id) {
   return new Promise((resolve, reject) => {
       connection.query(`DELETE FROM ${table} WHERE id=${id}`, (err, result) => {
+        console.log(result)
           if (err) return reject(err);
+          if(result.affectedRows<=0) return reject(boom.notFound('not found'))
           resolve(true);
       })
   })
