@@ -32,7 +32,7 @@ const uploadProduct = multer({
         //     cb(null, true);
         // }
         else {
-            console.log('eeeeerroororororo')
+            
           cb(boom.badRequest('not file type allowed'));
         }
     },
